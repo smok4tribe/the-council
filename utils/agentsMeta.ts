@@ -1,39 +1,30 @@
-// utils/agentsMeta.ts
-
 export const agentsMeta = {
-  gpt: {
-    name: "GPT-4",
-    icon: "🧠",
-    color: "#8E44AD",
+  GPT: {
+    color: '#10A37F',
+    icon: '🧠'
   },
-  claude: {
-    name: "Claude",
-    icon: "🦉",
-    color: "#2ECC71",
+  Claude: {
+    color: '#4B0082',
+    icon: '📘'
   },
-  gemini: {
-    name: "Gemini",
-    icon: "🌟",
-    color: "#3498DB",
+  Gemini: {
+    color: '#4285F4',
+    icon: '🔷'
   },
-  groq: {
-    name: "Groq",
-    icon: "⚡",
-    color: "#E67E22",
+  Groq: {
+    color: '#FF5733',
+    icon: '⚡️'
   },
-  mistral: {
-    name: "Mistral",
-    icon: "🌬️",
-    color: "#16A085",
+  Mistral: {
+    color: '#8A2BE2',
+    icon: '🌪️'
   },
-  perplexity: {
-    name: "Perplexity",
-    icon: "🌀",
-    color: "#F39C12",
+  Perplexity: {
+    color: '#000000',
+    icon: '🌀'
   },
-  huggingface: {
-    name: "Hugging Face",
-    icon: "🤗",
-    color: "#FF69B4",
-  },
+  HuggingFace: {
+    color: '#FFD21F',
+    icon: '🤗'
+  }
 };

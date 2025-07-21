@@ -1,76 +1,59 @@
-import { useEffect, useState } from 'react';
-import AgentResponse from "../components/AgentResponse";  
-import { agentsMeta } from "../utils/agentsMeta";  // Import metadata for agent display
+import { useState } from 'react';
+import Head from 'next/head';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import ChatBox from '@/components/ChatBox';
 
-export default function HomePage() {
-  const [responses, setResponses] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Home() {
+  const [question, setQuestion] = useState('');
+  const [conversation, setConversation] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [finished, setFinished] = useState(false);
 
-  useEffect(() => {
-    const callCouncil = async () => {
-      try {
-        const res = await fetch("/api/orchestrator", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            question: "Qual è il senso della vita?",
-            mute: false,
-            maxRounds: 6
-          })
-        });
-        const data = await res.json();
-        console.log("🤖 Risposta del Consiglio:", data);
-        if (data.responses) {
-          // Convert the responses object into an array of results
-          const extractedResponses = Object.entries(data.responses).map(([agentKey, agentData]) => ({
-            agentKey,
-            response: agentData.message || "",
-            status: agentData.status || "none"
-          }));
-          setResponses(extractedResponses);
-        } else {
-          console.error("Unexpected response format:", data);
-        }
-      } catch (error) {
-        console.error("Error calling the council orchestrator:", error);
-      } finally {
-        // Always remove loading state when done
-        setLoading(false);
-      }
-    };
 
-    // Trigger the orchestrator call when the component mounts
-    callCouncil();
-  }, []);
+  const handleSubmit = async () => {
+    if (!question.trim()) return;
+    setLoading(true);
+    setConversation([]);
+    try {
+      const res = await fetch('/api/orchestrator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+      setConversation(data.conversation);
+      setFinished(data.finished);
+    } catch (e) {
+      console.error('Errore durante la richiesta:', e);
+    }
+    setLoading(false);
+  };
 
   return (
-    <main className="p-6">
-      {/* Page Title */}
-      <h1 className="text-2xl font-bold flex items-center">
-        <span className="mr-2 text-3xl">🧠</span>
-        Risposte del Consiglio
-      </h1>
+    <>
+      <Head>
+        <title>The Council</title>
+      </Head>
+      <main className="max-w-3xl mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-6">🧠 The Council</h1>
 
-      {/* Conditional Rendering: Loading message or Responses list */}
-      {loading ? (
-        <p>⏳ Caricamento in corso...</p>
-      ) : (
-        // Display each agent's response using the AgentResponse component
-        responses.map(({ agentKey, response, status }) => {
-          // Lookup metadata for this agent (name, icon, color)
-          const { name: agentName = agentKey, icon = "🤖", color = "#ccc" } = agentsMeta[agentKey] || {};
-          return (
-            <AgentResponse
-              key={agentKey}
-              agentName={agentName}
-              icon={icon}
-              color={color}
-              response={response}
-              status={status}
-            />
-          );
-        })
-      )}
-    </main>
+        <div className="flex gap-2 mb-6">
+          <Input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Fai una domanda al consiglio..."
+            className="flex-1"
+          />
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Elaborazione...' : 'Invia'}
+          </Button>
+        </div>
+
+        {conversation.length > 0 && (
+          <ChatBox conversation={conversation} finished={true} />
+        )}
+      </main>
+    </>
   );
 }
